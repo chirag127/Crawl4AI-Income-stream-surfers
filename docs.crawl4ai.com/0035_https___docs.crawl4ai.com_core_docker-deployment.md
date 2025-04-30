@@ -1,7 +1,7 @@
 ---
 url: https://docs.crawl4ai.com/core/docker-deployment
 title: https://docs.crawl4ai.com/core/docker-deployment
-date: 2025-04-30T15:29:07.660356
+date: 2025-04-30T16:19:50.069999
 depth: 1
 ---
 

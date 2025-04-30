@@ -311,6 +311,8 @@ get or fetch the url of https://docs.crawl4ai.com/core/quickstart/
 
 get or fetch the url of https://docs.crawl4ai.com/core/deep-crawling/
 
+get or fetch the url of https://docs.crawl4ai.com/core/markdown-generation/ 
+
 get or fetch the following urls:
 https://docs.crawl4ai.com/core/markdown-generation/#2-how-markdown-generation-works
 https://docs.crawl4ai.com/

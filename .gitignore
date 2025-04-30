@@ -303,3 +303,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+modelcontextprotocol.io
+docs.expo.dev
+docs.crawl4ai.com

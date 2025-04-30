@@ -1,7 +1,7 @@
 ---
 url: https://docs.crawl4ai.com/advanced/session-management
 title: https://docs.crawl4ai.com/advanced/session-management
-date: 2025-04-30T15:28:54.256554
+date: 2025-04-30T16:19:35.077791
 depth: 1
 ---
 

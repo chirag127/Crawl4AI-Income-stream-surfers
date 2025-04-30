@@ -1,7 +1,7 @@
 ---
 url: https://docs.crawl4ai.com
 title: https://docs.crawl4ai.com
-date: 2025-04-30T15:28:41.649737
+date: 2025-04-30T16:19:23.595717
 depth: 1
 ---
 

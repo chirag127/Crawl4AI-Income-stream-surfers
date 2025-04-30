@@ -217,10 +217,10 @@ def main():
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(description='Crawl a website and save pages as markdown files.')
     parser.add_argument('url', help='The homepage URL to start crawling from')
-    parser.add_argument('--max-pages', type=int, default=300, help='Maximum number of pages to crawl (default: 300)')
+    parser.add_argument('--max-pages', type=int, default=500, help='Maximum number of pages to crawl (default: 300)')
     parser.add_argument('--output-dir', help='Base directory for output (default: website name)')
     parser.add_argument('--include-external', action='store_true', default=False, help='Follow external links')
-    parser.add_argument('--max-depth', type=int, default=3, help='Maximum depth to crawl (default: 3)')
+    parser.add_argument('--max-depth', type=int, default=2, help='Maximum depth to crawl (default: 2)')
 
     args = parser.parse_args()
 

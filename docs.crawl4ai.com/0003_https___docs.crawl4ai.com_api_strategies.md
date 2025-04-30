@@ -1,7 +1,7 @@
 ---
 url: https://docs.crawl4ai.com/api/strategies
 title: https://docs.crawl4ai.com/api/strategies
-date: 2025-04-30T15:28:44.730955
+date: 2025-04-30T16:19:35.069637
 depth: 1
 ---
 

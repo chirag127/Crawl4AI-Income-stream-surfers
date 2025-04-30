@@ -1,7 +1,7 @@
 ---
 url: https://docs.crawl4ai.com/core/browser-crawler-config
 title: https://docs.crawl4ai.com/core/browser-crawler-config
-date: 2025-04-30T15:28:56.818069
+date: 2025-04-30T16:19:38.150506
 depth: 1
 ---
 
