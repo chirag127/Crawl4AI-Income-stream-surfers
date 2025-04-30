@@ -1,152 +1,188 @@
+"""
+Flask application for multi-URL crawling using Crawl4AI.
+This application provides a web interface for crawling websites,
+viewing results, and downloading data.
+"""
+
 import os
-import json
+import asyncio
 import uuid
-import threading
-from flask import Flask, render_template, request, jsonify, send_file, session
-from utils.crawler import CrawlJob
+from urllib.parse import urlparse
+from datetime import datetime
+from flask import Flask, render_template, request, jsonify, send_file
+
+from crawler import start_crawling
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
 
-# Global dictionary to store active crawl jobs
-crawl_jobs = {}
+# Store active crawlers in memory
+active_crawlers = {}
 
 @app.route('/')
 def index():
-    """
-    Render the home page.
-    """
+    """Render the home page."""
     return render_template('index.html')
 
 @app.route('/api/crawl', methods=['POST'])
-def start_crawl():
+async def crawl():
     """
-    Start a new crawl job.
-    
-    Expects JSON with:
-    - url: The starting URL to crawl
-    - max_pages: Maximum number of pages to crawl (optional, default: 300)
-    
+    Start a new crawling job.
+
+    Expected JSON payload:
+    {
+        "url": "https://example.com",
+        "max_pages": 100
+    }
+
     Returns:
-    - job_id: Unique identifier for the job
-    - status: Initial status
-    - url: The starting URL
-    - max_pages: Maximum number of pages
+        JSON with crawler_id for tracking progress
     """
     data = request.json
     url = data.get('url')
-    
-    if not url:
-        return jsonify({'error': 'URL is required'}), 400
-    
-    # Create a new crawl job
-    job_id = str(uuid.uuid4())
-    max_pages = min(int(data.get('max_pages', 300)), 300)  # Limit to 300 pages
-    
-    # Initialize the job
-    job = CrawlJob(job_id, url, max_pages)
-    crawl_jobs[job_id] = job
-    
-    # Start the crawl in a background thread
-    thread = threading.Thread(target=job.start_crawl)
-    thread.daemon = True
-    thread.start()
-    
-    # Return the job ID and initial status
+    max_pages = int(data.get('max_pages', 100))
+
+    # Validate URL
+    if not url or not url.startswith(('http://', 'https://')):
+        return jsonify({'error': 'Invalid URL. Please provide a valid URL starting with http:// or https://'}), 400
+
+    # Validate max_pages
+    if max_pages < 1 or max_pages > 300:
+        return jsonify({'error': 'Invalid page count. Please provide a number between 1 and 300'}), 400
+
+    # Generate a unique ID for this crawling job
+    crawler_id = str(uuid.uuid4())
+
+    # Start crawling
+    crawler = await start_crawling(url, max_pages)
+
+    # Store crawler in memory
+    active_crawlers[crawler_id] = crawler
+
     return jsonify({
-        'job_id': job_id,
-        'status': 'started',
-        'url': url,
-        'max_pages': max_pages
+        'crawler_id': crawler_id,
+        'status': crawler.status,
+        'base_url': crawler.base_url,
+        'max_pages': crawler.max_pages,
+        'folder_name': crawler.folder_name
     })
 
-@app.route('/api/status/<job_id>', methods=['GET'])
-def get_status(job_id):
+@app.route('/api/progress/<crawler_id>', methods=['GET'])
+def get_progress(crawler_id):
     """
-    Get the status of a crawl job.
-    
-    Parameters:
-    - job_id: Unique identifier for the job
-    
-    Returns:
-    - Status information including progress
-    """
-    job = crawl_jobs.get(job_id)
-    
-    if not job:
-        return jsonify({'error': 'Job not found'}), 404
-    
-    return jsonify(job.get_status())
+    Get the progress of a crawling job.
 
-@app.route('/api/results/<job_id>', methods=['GET'])
-def get_results(job_id):
-    """
-    Get the results of a crawl job.
-    
-    Parameters:
-    - job_id: Unique identifier for the job
-    
-    Returns:
-    - Results and metadata
-    """
-    job = crawl_jobs.get(job_id)
-    
-    if not job:
-        return jsonify({'error': 'Job not found'}), 404
-    
-    return jsonify(job.get_results())
+    Args:
+        crawler_id: The ID of the crawler to check
 
-@app.route('/api/download/<job_id>', methods=['GET'])
-def download_results(job_id):
-    """
-    Download the results of a crawl job as a CSV file.
-    
-    Parameters:
-    - job_id: Unique identifier for the job
-    
     Returns:
-    - CSV file for download
+        JSON with progress information
     """
-    job = crawl_jobs.get(job_id)
-    
-    if not job:
-        return jsonify({'error': 'Job not found'}), 404
-    
-    # Generate CSV file
-    csv_file = job.to_csv()
-    
-    # Return the file for download
+    crawler = active_crawlers.get(crawler_id)
+    if not crawler:
+        return jsonify({'error': 'Crawler not found'}), 404
+
+    return jsonify(crawler.get_progress())
+
+@app.route('/api/results/<crawler_id>', methods=['GET'])
+def get_results(crawler_id):
+    """
+    Get the results of a completed crawling job.
+
+    Args:
+        crawler_id: The ID of the crawler to get results from
+
+    Returns:
+        JSON with results information
+    """
+    crawler = active_crawlers.get(crawler_id)
+    if not crawler:
+        return jsonify({'error': 'Crawler not found'}), 404
+
+    return jsonify(crawler.get_results())
+
+@app.route('/api/download/<crawler_id>', methods=['GET'])
+def download_results(crawler_id):
+    """
+    Download the results of a crawling job as CSV.
+
+    Args:
+        crawler_id: The ID of the crawler to download results from
+
+    Returns:
+        CSV file download
+    """
+    crawler = active_crawlers.get(crawler_id)
+    if not crawler:
+        return jsonify({'error': 'Crawler not found'}), 404
+
+    # Check if results CSV exists
+    csv_path = os.path.join(crawler.folder_name, 'results.csv')
+    if not os.path.exists(csv_path):
+        return jsonify({'error': 'Results file not found'}), 404
+
+    # Generate a filename for download
+    domain = urlparse(crawler.base_url).netloc.replace('.', '_')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"{domain}_crawl_results_{timestamp}.csv"
+
     return send_file(
-        csv_file,
+        csv_path,
         as_attachment=True,
-        download_name=f'crawl_{job_id}.csv',
+        download_name=filename,
         mimetype='text/csv'
     )
 
-@app.route('/api/history', methods=['GET'])
-def get_history():
+@app.route('/api/download/markdown/<crawler_id>', methods=['GET'])
+def download_markdown(crawler_id):
     """
-    Get the list of crawl jobs.
-    
-    Note: This is a placeholder. Actual history is managed client-side with localStorage.
-    
+    Download all markdown files as a zip archive.
+
+    Args:
+        crawler_id: The ID of the crawler to download markdown files from
+
     Returns:
-    - List of active crawl jobs
+        ZIP file download
     """
-    # Return a list of active job IDs
-    # Note: Full history is managed client-side with localStorage
-    active_jobs = [
-        {
-            'job_id': job_id,
-            'url': job.url,
-            'status': job.status,
-            'crawled_pages': job.crawled_pages,
-            'max_pages': job.max_pages
-        }
-        for job_id, job in crawl_jobs.items()
-    ]
-    
-    return jsonify({'active_jobs': active_jobs})
+    import zipfile
+    from io import BytesIO
+
+    crawler = active_crawlers.get(crawler_id)
+    if not crawler:
+        return jsonify({'error': 'Crawler not found'}), 404
+
+    # Create a zip file in memory
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        # Add all markdown files from the crawler's folder
+        for root, _, files in os.walk(crawler.folder_name):
+            for file in files:
+                if file.endswith('.md'):
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, crawler.folder_name)
+                    zf.write(file_path, arcname)
+
+    # Reset file pointer
+    memory_file.seek(0)
+
+    # Generate a filename for download
+    domain = urlparse(crawler.base_url).netloc.replace('.', '_')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"{domain}_markdown_files_{timestamp}.zip"
+
+    return send_file(
+        memory_file,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/zip'
+    )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Run the Flask app with asyncio support
+    import asyncio
+    from aioflask import run_app
+
+    # For Windows compatibility
+    if asyncio.get_event_loop_policy()._loop_factory is asyncio.SelectorEventLoop:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    run_app(app, debug=True, port=5000)

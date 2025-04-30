@@ -1,5 +1,7 @@
 flask
 crawl4ai
 pandas
-asyncio
-uuid
+aioflask
+python-dotenv
+requests
+urllib3

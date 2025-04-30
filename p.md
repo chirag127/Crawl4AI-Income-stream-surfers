@@ -1,4 +1,4 @@
-Make me a multi URL crawling flask project which takes the homepage of a website and then crawl 300 found pages using crawl4ai and allows for .csv download and saves all previous downloads in browser cache/cookies
+Make me a multi URL crawling python script which takes the homepage of a website and then crawl x found pages using crawl4ai and store the results in the md files in a folder named after the website.
 
 Crawl4AI: Open-source LLM Friendly Web Crawler & Scraper.
 unclecode%2Fcrawl4ai | Trendshift
@@ -303,11 +303,11 @@ We envision a future where AI is powered by real human knowledge, ensuring data 
 Star History
 Star History Chart
 
-fetch or get the use of https://docs.crawl4ai.com/advanced/multi-url-crawling/
+fetch or get the url of https://docs.crawl4ai.com/advanced/multi-url-crawling/
 
-get or fetch the use of https://docs.crawl4ai.com/core/fit-markdown/
+get or fetch the url of https://docs.crawl4ai.com/core/fit-markdown/
 
-
+get or fetch the url of https://docs.crawl4ai.com/core/quickstart/
 
 
 
