@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "docs-mcp-server": {
+      "command": "python",
+      "args": ["D:/AM/GitHub/Crawl4AI-Income-stream-surfers/docs_mcp_server/simple_server.py"],
+      "env": {
+        "DOCS_MCP_BASE_DIR": "D:/AM/GitHub/Crawl4AI-Income-stream-surfers/docs_mcp_server/test_docs"
+      }
+    }
+  }
+}
