@@ -1,0 +1,1 @@
+python crawler.py https://docs.crawl4ai.com/ 50
