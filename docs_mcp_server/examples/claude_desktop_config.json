@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "docs-mcp-server": {
+      "command": "python",
+      "args": ["path/to/docs_mcp_server/run_server.py"],
+      "env": {
+        "DOCS_MCP_BASE_DIR": "path/to/your/documentation",
+        "DOCS_MCP_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}

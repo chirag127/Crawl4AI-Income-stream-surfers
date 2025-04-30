@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "docs-mcp-server": {
+      "command": "uvx",
+      "args": ["docs-mcp-server@latest"],
+      "env": {
+        "DOCS_MCP_BASE_DIR": "path/to/your/documentation",
+        "DOCS_MCP_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
