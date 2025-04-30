@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crawl4AI Web Crawler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Crawl4AI Web Crawler</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Start a New Crawl</h2>
+            </div>
+            <div class="card-body">
+                <form id="crawlForm">
+                    <div class="mb-3">
+                        <label for="url" class="form-label">Website URL</label>
+                        <input type="url" class="form-control" id="url" placeholder="https://example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="maxPages" class="form-label">Maximum Pages (1-300)</label>
+                        <input type="number" class="form-control" id="maxPages" min="1" max="300" value="300">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Crawling</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="crawlStatus" class="card mb-4 d-none">
+            <div class="card-header">
+                <h2>Crawl Status</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p><strong>Job ID:</strong> <span id="jobId"></span></p>
+                    <p><strong>URL:</strong> <span id="crawlUrl"></span></p>
+                    <p><strong>Status:</strong> <span id="statusText">In Progress</span></p>
+                    <p><strong>Progress:</strong> <span id="progressText">0/0</span></p>
+                </div>
+                <div class="progress mb-3">
+                    <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <button id="downloadBtn" class="btn btn-success me-2 d-none">Download CSV</button>
+                <button id="viewResultsBtn" class="btn btn-info">View Results</button>
+            </div>
+        </div>
+        
+        <div id="resultsCard" class="card mb-4 d-none">
+            <div class="card-header">
+                <h2>Crawl Results</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Content Length</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Crawl History</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>URL</th>
+                                <th>Pages</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                            <!-- History will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <button id="clearHistoryBtn" class="btn btn-danger">Clear History</button>
+            </div>
+        </div>
+        
+        <footer class="mt-5 text-center">
+            <p>
+                <a href="https://github.com/unclecode/crawl4ai">
+                    <img src="https://img.shields.io/badge/Powered%20by-Crawl4AI-blue?style=flat-square" alt="Powered by Crawl4AI"/>
+                </a>
+            </p>
+            <p>This project uses <a href="https://github.com/unclecode/crawl4ai">Crawl4AI</a> for web data extraction.</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/storage.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

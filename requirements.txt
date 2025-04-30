@@ -1,0 +1,5 @@
+flask
+crawl4ai
+pandas
+asyncio
+uuid
