@@ -1,4 +1,63 @@
-Make me a multi URL crawling python script which takes the homepage of a website and then crawl x found pages using crawl4ai and store the results in the md files in a folder named after the website.
+modify the multi URL crawling python script which takes the homepage of a website and then crawl x found pages using crawl4ai and store the results in the md files in a folder named after the website.
+
+currently the script is getting freezed and not able to crawl the pages.
+
+
+fetch or get the url of https://docs.crawl4ai.com/advanced/multi-url-crawling/
+
+get or fetch the url of https://docs.crawl4ai.com/core/fit-markdown/
+
+get or fetch the url of https://docs.crawl4ai.com/core/quickstart
+
+get or fetch the url of https://docs.crawl4ai.com/core/deep-crawling/
+
+get or fetch the url of https://docs.crawl4ai.com/core/markdown-generation/
+
+get or fetch the url of  https://docs.crawl4ai.com/core/ask-ai/
+get or fetch the url of  https://docs.crawl4ai.com/core/quickstart/
+get or fetch the url of  https://docs.crawl4ai.com/core/examples/
+get or fetch the url of  https://docs.crawl4ai.com/core/installation/
+get or fetch the url of  https://docs.crawl4ai.com/core/docker-deployment/
+get or fetch the url of  https://docs.crawl4ai.com/blog/
+get or fetch the url of  https://github.com/unclecode/crawl4ai/blob/main/CHANGELOG.md
+get or fetch the url of  https://docs.crawl4ai.com/core/cli/
+get or fetch the url of  https://docs.crawl4ai.com/core/simple-crawling/
+get or fetch the url of  https://docs.crawl4ai.com/core/deep-crawling/
+get or fetch the url of  https://docs.crawl4ai.com/core/crawler-result/
+get or fetch the url of  https://docs.crawl4ai.com/core/browser-crawler-config/
+get or fetch the url of  https://docs.crawl4ai.com/core/fit-markdown/
+get or fetch the url of  https://docs.crawl4ai.com/core/page-interaction/
+get or fetch the url of  https://docs.crawl4ai.com/core/content-selection/
+get or fetch the url of  https://docs.crawl4ai.com/core/cache-modes/
+get or fetch the url of  https://docs.crawl4ai.com/core/local-files/
+get or fetch the url of  https://docs.crawl4ai.com/core/link-media/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/advanced-features/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/file-downloading/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/lazy-loading/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/hooks-auth/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/proxy-security/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/session-management/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/multi-url-crawling/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/crawl-dispatcher/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/identity-based-crawling/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/ssl-certificate/
+get or fetch the url of  https://docs.crawl4ai.com/advanced/network-console-capture/
+get or fetch the url of  https://docs.crawl4ai.com/extraction/no-llm-strategies/
+get or fetch the url of  https://docs.crawl4ai.com/extraction/llm-strategies/
+get or fetch the url of  https://docs.crawl4ai.com/extraction/clustring-strategies/
+get or fetch the url of  https://docs.crawl4ai.com/extraction/chunking/
+get or fetch the url of  https://docs.crawl4ai.com/api/async-webcrawler/
+get or fetch the url of  https://docs.crawl4ai.com/api/arun/
+get or fetch the url of  https://docs.crawl4ai.com/api/arun_many/
+get or fetch the url of  https://docs.crawl4ai.com/api/parameters/
+get or fetch the url of  https://docs.crawl4ai.com/api/crawl-result/
+get or fetch the url of  https://docs.crawl4ai.com/api/strategies/
+
+
+
+modify the script to crawl the pages and store the results in the md files in a folder named after the website.
+The script should be able to crawl the pages and store the results in the md files in a folder named after the website.
+when the script is rerunned it should not crawl the pages again and should not store the results in the md files in a folder named after the website.
 
 Crawl4AI: Open-source LLM Friendly Web Crawler & Scraper.
 unclecode%2Fcrawl4ai | Trendshift
@@ -302,58 +361,6 @@ We envision a future where AI is powered by real human knowledge, ensuring data 
 🚀 Development Pathway
 Star History
 Star History Chart
-
-fetch or get the url of https://docs.crawl4ai.com/advanced/multi-url-crawling/
-
-get or fetch the url of https://docs.crawl4ai.com/core/fit-markdown/
-
-get or fetch the url of https://docs.crawl4ai.com/core/quickstart/
-
-get or fetch the url of https://docs.crawl4ai.com/core/deep-crawling/
-
-get or fetch the url of https://docs.crawl4ai.com/core/markdown-generation/
-
-get or fetch the url of  https://docs.crawl4ai.com/core/markdown-generation/#2-how-markdown-generation-works
-get or fetch the url of  https://docs.crawl4ai.com/
-get or fetch the url of  https://docs.crawl4ai.com/core/ask-ai/
-get or fetch the url of  https://docs.crawl4ai.com/core/quickstart/
-get or fetch the url of  https://docs.crawl4ai.com/core/examples/
-get or fetch the url of  https://docs.crawl4ai.com/core/installation/
-get or fetch the url of  https://docs.crawl4ai.com/core/docker-deployment/
-get or fetch the url of  https://docs.crawl4ai.com/blog/
-get or fetch the url of  https://github.com/unclecode/crawl4ai/blob/main/CHANGELOG.md
-get or fetch the url of  https://docs.crawl4ai.com/core/cli/
-get or fetch the url of  https://docs.crawl4ai.com/core/simple-crawling/
-get or fetch the url of  https://docs.crawl4ai.com/core/deep-crawling/
-get or fetch the url of  https://docs.crawl4ai.com/core/crawler-result/
-get or fetch the url of  https://docs.crawl4ai.com/core/browser-crawler-config/
-get or fetch the url of  https://docs.crawl4ai.com/core/fit-markdown/
-get or fetch the url of  https://docs.crawl4ai.com/core/page-interaction/
-get or fetch the url of  https://docs.crawl4ai.com/core/content-selection/
-get or fetch the url of  https://docs.crawl4ai.com/core/cache-modes/
-get or fetch the url of  https://docs.crawl4ai.com/core/local-files/
-get or fetch the url of  https://docs.crawl4ai.com/core/link-media/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/advanced-features/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/file-downloading/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/lazy-loading/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/hooks-auth/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/proxy-security/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/session-management/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/multi-url-crawling/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/crawl-dispatcher/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/identity-based-crawling/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/ssl-certificate/
-get or fetch the url of  https://docs.crawl4ai.com/advanced/network-console-capture/
-get or fetch the url of  https://docs.crawl4ai.com/extraction/no-llm-strategies/
-get or fetch the url of  https://docs.crawl4ai.com/extraction/llm-strategies/
-get or fetch the url of  https://docs.crawl4ai.com/extraction/clustring-strategies/
-get or fetch the url of  https://docs.crawl4ai.com/extraction/chunking/
-get or fetch the url of  https://docs.crawl4ai.com/api/async-webcrawler/
-get or fetch the url of  https://docs.crawl4ai.com/api/arun/
-get or fetch the url of  https://docs.crawl4ai.com/api/arun_many/
-get or fetch the url of  https://docs.crawl4ai.com/api/parameters/
-get or fetch the url of  https://docs.crawl4ai.com/api/crawl-result/
-get or fetch the url of  https://docs.crawl4ai.com/api/strategies/
 
 
 

@@ -1,0 +1,84 @@
+---
+url: https://reactnative.dev/contributing/how-to-contribute-code
+title: https://reactnative.dev/contributing/how-to-contribute-code
+date: 2025-05-10T21:35:44.733664
+depth: 2
+---
+
+[Skip to main content](https://reactnative.dev/contributing/how-to-contribute-code#__docusaurus_skipToContent_fallback)
+Join us for React Conf on Oct 7-8. [Learn more](https://conf.react.dev).
+On this page
+Thank you for your interest in contributing to React Native! From commenting on and triaging issues, to reviewing and sending PRs, [all contributions are welcome](https://reactnative.dev/contributing/overview). In this document, we'll cover the steps to contributing code to React Native.
+If you are eager to start contributing code right away, we have a list of [`good first issues`](https://github.com/facebook/react-native/labels/good%20first%20issue) that contain bugs which have a relatively limited scope. Issues labeled [`help wanted`](https://github.com/facebook/react-native/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22help+wanted+%3Aoctocat%3A%22+sort%3Aupdated-desc+) are good issues to submit a PR for.
+## Prerequisites[​](https://reactnative.dev/contributing/how-to-contribute-code#prerequisites "Direct link to Prerequisites")
+info
+Please refer to the [Environment Setup](https://reactnative.dev/docs/environment-setup) guide to setup required tools and the development environment based on the platform us use and platform which you want to develop for.
+## Development Workflow[​](https://reactnative.dev/contributing/how-to-contribute-code#development-workflow "Direct link to Development Workflow")
+After cloning React Native, open the directory and run `yarn` to install its dependencies.
+Now you are set up to run several commands:
+  * `yarn start` starts the Metro packager server.
+  * `yarn lint` checks the code style.
+  * `yarn format` automatically formats your code.
+  * `yarn test` runs the Jest-based JavaScript test suite. 
+    * `yarn test --watch` runs an interactive JavaScript test watcher.
+    * `yarn test <pattern>` runs JavaScript tests with matching filenames.
+  * `yarn flow` runs the [Flow](https://flowtype.org/) typechecks. 
+    * `yarn flow-check-android` does a full Flow check over `*.android.js` files.
+    * `yarn flow-check-ios` does a full Flow check over `*.ios.js` files.
+  * `yarn test-typescript` runs the [TypeScript](https://www.typescriptlang.org/) typechecks.
+  * `yarn test-ios` runs the iOS test suite (macOS required).
+  * `yarn build` builds all configured packages — in general, this command only needs to be run by CI ahead of publishing. 
+    * Packages which require a build are configured in [scripts/build/config.js](https://github.com/facebook/react-native/blob/main/scripts/build/config.js).
+
+
+## Testing your Changes[​](https://reactnative.dev/contributing/how-to-contribute-code#testing-your-changes "Direct link to Testing your Changes")
+Tests help us prevent regressions from being introduced to the codebase. We recommend running `yarn test` or the platform-specific scripts above to make sure you don't introduce any regressions as you work on your change.
+The GitHub repository is [continuously tested](https://reactnative.dev/contributing/how-to-run-and-write-tests#continuous-testing) using CircleCI, the results of which are available through the Checks functionality on [commits](https://github.com/facebook/react-native/commits/main) and pull requests.
+You can learn more about running and writing tests on the [How to Run and Write Tests](https://reactnative.dev/contributing/how-to-run-and-write-tests) page.
+## Coding Style[​](https://reactnative.dev/contributing/how-to-contribute-code#coding-style "Direct link to Coding Style")
+We use Prettier to format our JavaScript code. This saves you time and energy as you can let Prettier fix up any formatting issues automatically through its editor integrations, or by manually running `yarn run prettier`. We also use a linter to catch styling issues that may exist in your code. You can check the status of your code styling by running `yarn run lint`.
+However, there are still some styles that the linter cannot pick up, notably in Java or Objective-C code.
+### Objective-C[​](https://reactnative.dev/contributing/how-to-contribute-code#objective-c "Direct link to Objective-C")
+  * Space after `@property` declarations
+  * Brackets on _every_ `if`, on the _same_ line
+  * `- method`, `@interface`, and `@implementation` brackets on the following line
+  * _Try_ to keep it around 80 characters line length (sometimes it's not possible...)
+  * `*` operator goes with the variable name (e.g. `NSObject *variableName;`)
+
+
+### Java[​](https://reactnative.dev/contributing/how-to-contribute-code#java "Direct link to Java")
+  * If a method call spans multiple lines closing bracket is on the same line as the last argument.
+  * If a method header doesn't fit on one line each argument goes on a separate line.
+  * 100 character line length
+
+
+## Sending a Pull Request[​](https://reactnative.dev/contributing/how-to-contribute-code#sending-a-pull-request "Direct link to Sending a Pull Request")
+Code-level contributions to React Native generally come in the form of [a pull request](https://help.github.com/en/articles/about-pull-requests). The process of proposing a change to React Native can be summarized as follows:
+  1. Fork the React Native repository and create your branch from `main`.
+  2. If you've added code that should be tested, add tests.
+  3. If you've changed APIs, update the documentation.
+  4. Ensure the test suite passes, either locally or on CI once you opened a pull request.
+  5. Make sure your code lints (for example via `yarn lint --fix`).
+  6. Push the changes to your fork.
+  7. Create a pull request to the React Native repository.
+  8. Review and address comments on your pull request.
+  9. A bot may comment with suggestions. Generally we ask you to resolve these first before a maintainer will review your code.
+  10. If you haven't already, submit the [Contributor License Agreement ("CLA")](https://reactnative.dev/contributing/how-to-contribute-code#contributor-license-agreement).
+
+
+If all goes well, your pull request will be merged. If it is not merged, maintainers will do their best to explain their reasoning.
+If this is your first time sending a pull request, we have created a [step-by-step guide to help you get started](https://reactnative.dev/contributing/how-to-open-a-pull-request). For more detailed information on how pull requests are handled, see the [Managing Pull Requests page](https://reactnative.dev/contributing/managing-pull-requests).
+### Contributor License Agreement[​](https://reactnative.dev/contributing/how-to-contribute-code#contributor-license-agreement "Direct link to Contributor License Agreement")
+In order to accept your pull request, we need you to submit a [Contributor License Agreement (CLA)](https://reactnative.dev/contributing/contribution-license-agreement). You only need to do this once to work on any of Meta's open source projects. It only takes a minute, so you can do it while you wait for your dependencies to install.
+## License[​](https://reactnative.dev/contributing/how-to-contribute-code#license "Direct link to License")
+By contributing to React Native, you agree that your contributions will be licensed under the [LICENSE](https://github.com/facebook/react-native/blob/main/LICENSE) file in the root directory of the React Native repository.
+Is this page useful?
+  * [Prerequisites](https://reactnative.dev/contributing/how-to-contribute-code#prerequisites)
+  * [Development Workflow](https://reactnative.dev/contributing/how-to-contribute-code#development-workflow)
+  * [Testing your Changes](https://reactnative.dev/contributing/how-to-contribute-code#testing-your-changes)
+  * [Coding Style](https://reactnative.dev/contributing/how-to-contribute-code#coding-style)
+  * [Sending a Pull Request](https://reactnative.dev/contributing/how-to-contribute-code#sending-a-pull-request)
+    * [Contributor License Agreement](https://reactnative.dev/contributing/how-to-contribute-code#contributor-license-agreement)
+
+
+

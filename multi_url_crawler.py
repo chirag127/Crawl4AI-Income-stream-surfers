@@ -4,21 +4,29 @@ Multi-URL Crawler using Crawl4AI
 
 This script crawls a website starting from the homepage, and saves the content
 of each page as a markdown file in a folder named after the website.
+
+Features:
+- Memory-adaptive crawling to prevent freezing
+- Rate limiting to avoid overwhelming servers
+- Caching to avoid recrawling already processed pages
+- Error handling and recovery
+- Progress reporting
 """
 
 import asyncio
+import json
 import os
 import re
 import time
 import argparse
 from datetime import datetime
 from urllib.parse import urlparse
-from pathlib import Path
 
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
 from crawl4ai.deep_crawling import BFSDeepCrawlStrategy
 from crawl4ai.content_filter_strategy import PruningContentFilter
 from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
+from crawl4ai.async_dispatcher import MemoryAdaptiveDispatcher, RateLimiter
 
 
 def extract_website_name(url):
@@ -83,6 +91,26 @@ depth: {result.metadata.get('depth', 0)}
         return None
 
 
+def load_cache(cache_file):
+    """Load the cache of crawled URLs."""
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading cache: {str(e)}")
+    return {}
+
+
+def save_cache(cache_file, cache):
+    """Save the cache of crawled URLs."""
+    try:
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        print(f"Error saving cache: {str(e)}")
+
+
 def write_summary(output_dir, stats, config):
     """Write a summary of the crawl."""
     try:
@@ -94,6 +122,7 @@ def write_summary(output_dir, stats, config):
 - Total pages crawled: {stats['total']}
 - Successful crawls: {stats['success']}
 - Failed crawls: {stats['failed']}
+- Skipped (already crawled): {stats.get('skipped', 0)}
 - Time taken: {stats['time_taken']:.2f} seconds
 
 ## Configuration
@@ -101,6 +130,7 @@ def write_summary(output_dir, stats, config):
 - Max pages: {config['max_pages']}
 - Max depth: {config['max_depth']}
 - Include external: {config['include_external']}
+- Force recrawl: {config.get('force_recrawl', False)}
 
 ## Crawled URLs
 """
@@ -117,7 +147,7 @@ def write_summary(output_dir, stats, config):
         return None
 
 
-async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, include_external=False):
+async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, include_external=False, force_recrawl=False):
     """
     Crawl a website and save the results as markdown files.
 
@@ -127,6 +157,7 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         output_dir: Directory to save the markdown files
         max_depth: Maximum depth to crawl
         include_external: Whether to follow external links
+        force_recrawl: Whether to recrawl pages that have already been crawled
 
     Returns:
         Dictionary with statistics about the crawl
@@ -135,6 +166,10 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
     if output_dir is None:
         website_name = extract_website_name(url)
         output_dir = create_output_directory(website_name)
+
+    # Load cache
+    cache_file = os.path.join(output_dir, "crawl_cache.json")
+    cache = load_cache(cache_file)
 
     # Configure the content filter for better markdown
     content_filter = PruningContentFilter(threshold=0.4, threshold_type="dynamic")
@@ -161,6 +196,22 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         max_pages=max_pages
     )
 
+    # Create a rate limiter
+    rate_limiter = RateLimiter(
+        base_delay=(1.0, 3.0),  # Random delay between 1-3 seconds
+        max_delay=30.0,         # Maximum backoff delay
+        max_retries=3,          # Retry failed requests up to 3 times
+        rate_limit_codes=[429, 503]  # Status codes that trigger backoff
+    )
+
+    # Create a dispatcher
+    dispatcher = MemoryAdaptiveDispatcher(
+        memory_threshold_percent=80.0,  # Pause if memory exceeds 80%
+        check_interval=1.0,             # Check memory every second
+        max_session_permit=5,           # Maximum concurrent tasks
+        rate_limiter=rate_limiter       # Use our rate limiter
+    )
+
     run_config = CrawlerRunConfig(
         cache_mode=CacheMode.BYPASS,
         deep_crawl_strategy=deep_crawl_strategy,
@@ -174,37 +225,60 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         'total': 0,
         'success': 0,
         'failed': 0,
+        'skipped': 0,
         'urls': [],
         'start_time': time.time()
     }
 
     # Start crawling
     print(f"Starting crawl of {url} with max {max_pages} pages...")
-    async with AsyncWebCrawler(config=browser_config) as crawler:
-        async for result in await crawler.arun(url, config=run_config):
-            stats['total'] += 1
+    try:
+        async with AsyncWebCrawler(config=browser_config) as crawler:
+            async for result in await crawler.arun(url, config=run_config, dispatcher=dispatcher):
+                stats['total'] += 1
 
-            if result.success:
-                stats['success'] += 1
-                stats['urls'].append(result.url)
+                # Skip URLs that have already been crawled unless force_recrawl is True
+                if not force_recrawl and result.url in cache:
+                    stats['skipped'] += 1
+                    print(f"[{stats['total']}] Skipped: {result.url} - Already crawled on {cache[result.url]}")
+                    continue
 
-                # Save the markdown file
-                filepath = save_markdown_file(result, output_dir, stats['total'])
-                if filepath:
-                    print(f"[{stats['total']}] Saved: {result.url} -> {os.path.basename(filepath)}")
-            else:
-                stats['failed'] += 1
-                print(f"[{stats['total']}] Failed: {result.url} - {result.error_message}")
+                if result.success:
+                    stats['success'] += 1
+                    stats['urls'].append(result.url)
+
+                    # Save the markdown file
+                    filepath = save_markdown_file(result, output_dir, stats['total'])
+                    if filepath:
+                        print(f"[{stats['total']}] Saved: {result.url} -> {os.path.basename(filepath)}")
+
+                    # Update the cache with the current timestamp
+                    cache[result.url] = datetime.now().isoformat()
+                    # Save cache periodically (every 10 successful crawls)
+                    if stats['success'] % 10 == 0:
+                        save_cache(cache_file, cache)
+                else:
+                    stats['failed'] += 1
+                    print(f"[{stats['total']}] Failed: {result.url} - {result.error_message}")
+    except Exception as e:
+        print(f"Error during crawl: {str(e)}")
+        # Save cache on error to preserve progress
+        save_cache(cache_file, cache)
+        raise
 
     # Calculate time taken
     stats['time_taken'] = time.time() - stats['start_time']
+
+    # Save final cache
+    save_cache(cache_file, cache)
 
     # Write summary
     config = {
         'url': url,
         'max_pages': max_pages,
         'max_depth': max_depth,
-        'include_external': include_external
+        'include_external': include_external,
+        'force_recrawl': force_recrawl
     }
     summary_path = write_summary(output_dir, stats, config)
     if summary_path:
@@ -217,10 +291,12 @@ def main():
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(description='Crawl a website and save pages as markdown files.')
     parser.add_argument('url', help='The homepage URL to start crawling from')
-    parser.add_argument('--max-pages', type=int, default=500, help='Maximum number of pages to crawl (default: 300)')
+    parser.add_argument('--max-pages', type=int, default=500, help='Maximum number of pages to crawl (default: 500)')
     parser.add_argument('--output-dir', help='Base directory for output (default: website name)')
     parser.add_argument('--include-external', action='store_true', default=False, help='Follow external links')
     parser.add_argument('--max-depth', type=int, default=2, help='Maximum depth to crawl (default: 2)')
+    parser.add_argument('--force-recrawl', action='store_true', default=False, help='Force recrawling of already crawled pages')
+    parser.add_argument('--concurrent-tasks', type=int, default=5, help='Maximum number of concurrent crawling tasks (default: 5)')
 
     args = parser.parse_args()
 
@@ -248,7 +324,8 @@ def main():
             max_pages=args.max_pages,
             output_dir=output_dir,
             max_depth=args.max_depth,
-            include_external=args.include_external
+            include_external=args.include_external,
+            force_recrawl=args.force_recrawl
         ))
 
         # Print final statistics
@@ -256,6 +333,7 @@ def main():
         print(f"Total pages: {stats['total']}")
         print(f"Successful: {stats['success']}")
         print(f"Failed: {stats['failed']}")
+        print(f"Skipped (already crawled): {stats.get('skipped', 0)}")
         print(f"Time taken: {stats['time_taken']:.2f} seconds")
         print(f"Results saved to: {output_dir}")
 
