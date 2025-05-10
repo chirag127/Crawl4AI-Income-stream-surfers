@@ -304,4 +304,3 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 docs.crawl4ai.com
-modelcontextprotocol.io
