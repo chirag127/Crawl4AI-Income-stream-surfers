@@ -1,0 +1,69 @@
+---
+url: https://expo.dev/blog/from-rnc-cli-to-expo
+title: https://expo.dev/blog/from-rnc-cli-to-expo
+date: 2025-04-30T17:18:15.274150
+depth: 2
+---
+
+[All Posts](https://expo.dev/blog)
+Share this post
+# Driving Innovation: MyWheels' Journey from RNC CLI to Expo
+Users, Development•July 23, 2024•11 minute read
+Steve Galili
+Guest Author
+Learn how a migration from RNC CLI to Expo improves app performance, expedites releases, and fosters strong collaboration across teams. 
+_This is a guest post from Steve Galili, a Lead Software Engineer at MyWheels based in Amsterdam, the Netherlands. Steve specializes in mastering React Native for optimal product, UX, and DevX, and is passionate about open source contributions._
+•••
+In the dynamic realm of urban mobility, where parked cars often outnumber pedestrians, Henry Mentink envisioned a community where **cars are shared like Spotify playlists** rather than accumulated like collectible items. What started as a grassroots experiment has grown into [MyWheels](https://mywheels.nl/), the Netherlands' leading car-sharing platform, driven by a mission for sustainable urban living. MyWheels isn't just about wheels—it's a journey towards reducing car ownership and carbon footprints, with shared vehicles conveniently stationed in every neighborhood.
+Our transition from React Native RNC CLI to Expo wasn't merely a technical upgrade; it represented a shift from cumbersome processes to streamlined efficiency. RNC CLI posed challenges with slow builds and bridging gaps between web and mobile development, akin to navigating complex territory. Expo arrived as a hero with its polished workflows and robust cross-platform capabilities, empowering us to boost app performance, expedite releases, and foster stronger collaboration across teams.
+At MyWheels, this migration has not only improved our codebase but also revitalized our teamwork. In less than three months, Expo has brought us together, aligning efforts and demonstrating its versatility. Even our web developer on a Linux machine quickly adapted to Expo, picking up development tasks with ease—a feat that would have been challenging with RNC CLI.
+To CTOs, tech leads, and developers considering the same migration, stay tuned for this blog as we share insights into our journey.
+## [Why migrate from RNC CLI to Expo CLI ](https://expo.dev/blog/from-rnc-cli-to-expo#why-migrate-from-rnc-cli-to-expo-cli)
+Transitioning away from RNC CLI presented a series of daunting challenges. Our previous release habits, which included frequent updates adeptly handled by a developer who knew the ins and outs of Xcode’s buttons, underscored the complexities we faced. For the rest of the team, the platform's setup quirks often felt like navigating a labyrinth with shifting walls, causing inconsistencies that strained our development velocity and threw our release cycles off-kilter. Local builds were time-consuming and cumbersome, akin to watching a slow-motion replay of our progress. Onboarding new developers, especially those with web backgrounds, required significant effort to bridge the gap between web and mobile development within RN.
+Reflecting on my early days at MyWheels, where my entire first day was spent battling Java and Objective-C errors due to Xcode discrepancies with React Native, Expo represents a promising future where such challenges are minimized. I remember thinking to myself, "_There must be a better way to do this._ " The challenges were so intense that I almost started contemplating another profession altogether.
+Enter Expo, our chosen solution to streamline our development processes. **Expo wasn't just a tool—it was a comprehensive solution promising to alleviate the complexities of CLI setups**. Our migration goals were straightforward: enhance development workflows, foster collaboration across teams, and eliminate compatibility issues that had previously plagued our deployments. Expo's unified approach simplified everything from build processes to debugging, offering a significant leap in efficiency and innovation.
+## [Boosting developer velocity/experience ](https://expo.dev/blog/from-rnc-cli-to-expo#boosting-developer-velocityexperience)
+Our journey with Expo marked a significant shift in our release strategy, transforming it from a cumbersome 3-week cycle to a streamlined weekly release schedule. This transition not only accelerated our ability to deliver updates but also enhanced our responsiveness to user feedback and market demands. Graphical representations of our release cycle demonstrate a marked improvement over time, reflecting Expo's impact on our development agility and efficiency.
+### [Improving the CI/CD flow ](https://expo.dev/blog/from-rnc-cli-to-expo#improving-the-cicd-flow)
+[Expo App Services (EAS)](https://expo.dev/eas) emerged as a cornerstone in simplifying our build and deployment processes. Before EAS, we relied on manual builds and uploads from Xcode, a process prone to errors and delays. EAS offered a seamless alternative that was remarkably easy to configure compared to other CI/CD platforms like GitHub Actions or Bitrise. Its straightforward CLI, friendly documentation, and reliable infrastructure made integration smooth and hassle-free. 
+Now, our workflow involves cutting a release every Monday, generating a changelog from diffs, and creating a Pull Request (PR). GitLab's CI triggers the EAS build and submission automatically when a PR is opened to release/* branches. The process has become so streamlined that the rest of the team jokes about grabbing popcorn and waiting for the magic to happen.
+## [Enhancing developer synergy ](https://expo.dev/blog/from-rnc-cli-to-expo#enhancing-developer-synergy)
+Expo has fundamentally transformed how our team collaborates and develops cross-platform solutions. By enabling our React web developers to seamlessly transition to mobile development, Expo brought all hands onto the app. One memorable Monday, I woke up to find that the other two teams, previously focused solely on web services like our business portal and back office apps, had onboarded themselves and started working on the mobile app. It was incredible to see people no longer afraid of tackling this gigantic app, which once made running it locally a nightmare.
+Some developers don't even know what's happening in the iOS or Android folders. I asked one of our most valued senior front-end engineers, if he knew what a `Podfile` or `AndroidManifest` is, and he didn’t, simply because he's a JS engineer. It's like asking Batman to use a lightsaber—it just doesn't fit. Thanks to Expo, this generation of engineers doesn't need to worry about these files and what happens under the hood. We now focus on what truly matters for MyWheels: building the best car-sharing app in Europe. Expo’s comprehensive documentation and vibrant community support have been invaluable. For example, we easily migrated to using [expo-image-picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/) with zero configuration, and the docs were as clear as a Pixar storyboard! This collective knowledge and support have significantly accelerated our development process, making Expo an indispensable part of our toolkit.
+## [Simplifying development and debugging ](https://expo.dev/blog/from-rnc-cli-to-expo#simplifying-development-and-debugging)
+Expo has revolutionized our local development process. No more wrestling with cryptic Java errors! Our latest developer was onboarded at warp speed, squashing bugs on day one. When I'm reviewing PRs, I can switch and build the app in just under two minutes, and it runs smoothly on multiple devices. [Expo’s debugging and profiling tools](https://docs.expo.dev/debugging/tools/#debugging-with-chrome-devtools) work seamlessly with Chrome DevTools straight out of the box, making it easier than finding Waldo to identify and fix issues. Pausing on breakpoints and inspecting network requests feels like playing detective, uncovering the culprit in record time. This efficiency has turbocharged our workflow at MyWheels. In just a few hours, we can turn an idea into an internal test track for our Product Owner’s feedback, creating a feedback loop faster than ever.
+## [Upgrading and simplifying core modules ](https://expo.dev/blog/from-rnc-cli-to-expo#upgrading-and-simplifying-core-modules)
+These are some of the Expo libraries we've migrated to: [expo-file-system](https://docs.expo.dev/versions/latest/sdk/filesystem/), [expo-intent-launcher](https://docs.expo.dev/versions/latest/sdk/intent-launcher/), [expo-sharing](https://docs.expo.dev/versions/latest/sdk/sharing/), (you can find them all under Expo’s roof) and many more. Configuring them was plug-and-play and hassle-free, shrinking our codebase while maintaining or enhancing functionality compared to RN community alternatives. With Expo's CLI and seamless configuration, we now upgrade third-party libraries more frequently and easily—a cadence that keeps our development process smooth and efficient.
+I almost forgot what RN's Upgrade Helper looked like—it's like trying to teach an old dog new tricks. Expo makes upgrades smoother than a jazz saxophonist on a Sunday morning.
+We recently migrated away from a marketing tool lacking an Expo plugin, a red flag for us. Additionally, we've enabled features like Google Pay with our [custom Expo plugin](https://gist.github.com/vanGalilea/eddd936080ef5fd022b1390de5c991dc) using [expo/config-plugins](https://docs.expo.dev/config-plugins/plugins-and-mods/), extending functionality beyond what was out of the box.
+## [Considering the transition from RNC CLI to Expo? ](https://expo.dev/blog/from-rnc-cli-to-expo#considering-the-transition-from-rnc-cli-to-expo-)
+Here's how I recommend getting started:
+  * Outline your app's essential features that must be integrated immediately vs. those that can be phased in later, such as navigation and push notifications (_you might be able to keep using the RNC ones_).
+  * Focus on minimal migration to Expo for swift deployment and functionality.
+  * Identify which third-party libraries you're using and that might already support Expo or have plugins available; prioritize updating or replacing those that don't.
+  * Create pre and post-migration wish lists to streamline this process.
+  * Discuss timelines and potential trade-offs with your team to ensure alignment and manage expectations.
+  * Assign one engineer to lead the migration while others maintain regular development, ensuring smooth progress.
+  * Concurrently, if you have an extra set of hands, a second engineer can set up CI/CD with EAS to automate build and deployment processes.
+
+
+And, if met with skepticism from stakeholders, emphasize that this is a short-term effort with a 1-3 month timeline, promising substantial long-term gains in productivity and innovation, much like _planting a tree that yields quick and lasting benefits_.
+## [Personal reflection and team acknowledgement ](https://expo.dev/blog/from-rnc-cli-to-expo#personal-reflection-and-team-acknowledgement)
+MyWheels’ migration journey with Expo has been nothing short of transformative. As a team, we've embraced Expo as more than just a tool—it's become an integral part of our development ethos. Looking forward, we're committed to simplifying our app's navigation with [Expo Router](https://docs.expo.dev/router/introduction/), tackling it screen by screen, stack by stack. We're also eager to leverage [Expo updates to streamline over-the-air updates (OTA)](https://docs.expo.dev/versions/latest/sdk/updates/), ensuring our users get the latest features seamlessly. Personally, I can't imagine building a React Native app without Expo anymore—it's a no-brainer, really.
+Feel free to reach out with any questions via [Twitter](https://x.com/vanGalilea) or [LinkedIn](https://www.linkedin.com/in/%F0%9F%9A%97-steve-galili-09434698/) or send me a message or email me at [steve.galili@mywheels.nl](https://expo.dev/blog/from-rnc-cli-to-expo).
+For more information about MyWheels, visit our [website](https://mywheels.nl/en).
+We look forward to hearing from you!
+Expo migration
+developer experience
+debugging
+CI/CD
+#### Table of Contents
+[Why migrate from RNC CLI to Expo CLI](https://expo.dev/blog/from-rnc-cli-to-expo#why-migrate-from-rnc-cli-to-expo-cli)[Boosting developer velocity/experience](https://expo.dev/blog/from-rnc-cli-to-expo#boosting-developer-velocityexperience)[Improving the CI/CD flow](https://expo.dev/blog/from-rnc-cli-to-expo#improving-the-cicd-flow)[Enhancing developer synergy](https://expo.dev/blog/from-rnc-cli-to-expo#enhancing-developer-synergy)[Simplifying development and debugging](https://expo.dev/blog/from-rnc-cli-to-expo#simplifying-development-and-debugging)[Upgrading and simplifying core modules](https://expo.dev/blog/from-rnc-cli-to-expo#upgrading-and-simplifying-core-modules)[Considering the transition from RNC CLI to Expo? ](https://expo.dev/blog/from-rnc-cli-to-expo#considering-the-transition-from-rnc-cli-to-expo-)[Personal reflection and team acknowledgement](https://expo.dev/blog/from-rnc-cli-to-expo#personal-reflection-and-team-acknowledgement)
+#### Related Blog Posts
+[incident.io harnesses the power of native modules and CNG](https://expo.dev/blog/incident-io-harnesses-the-power-of-native-modules-and-cng)[Build fast, flexible calendars with Flash Calendar](https://expo.dev/blog/build-fast-flexible-calendars-in-react-native-with-flash-calendar)[How Belka built MangaYo! app in just 3 months with Expo](https://expo.dev/blog/how-belka-built-mangayo-app-in-just-3-months-with-expo)
+Share this post
+### Sign up for the Expo Newsletter
+Sign up to receive a summary of new features, capabilities, content, and news about Expo and the React Native community.
+### Dive in, and create your first Expo project
+[Learn More](https://docs.expo.dev)
+
