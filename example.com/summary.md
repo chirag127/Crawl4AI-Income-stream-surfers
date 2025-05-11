@@ -1,12 +1,12 @@
 # Crawl Summary
 
 ## Statistics
-- Total pages crawled: 1
-- Successful crawls: 0
+- Total URLs encountered: 1
+- Successfully crawled and saved: 0
 - Failed crawls: 0
-- Skipped (already crawled): 0
-- Skipped (pattern filtered): 1
-- Time taken: 3.60 seconds
+- Skipped (already in cache): 0
+- Skipped (pattern mismatch): 1
+- Time taken: 2.86 seconds
 
 ## Configuration
 - Starting URL: https://example.com
@@ -16,9 +16,13 @@
 - Force recrawl: True
 - URL pattern: nonexistent
 
-## Crawled URLs
+## Filtering Information
+- Cache-based filtering: Disabled (--force-recrawl flag was set)
+- Pattern-based filtering: Enabled (only processing URLs containing 'nonexistent')
+- Pattern matching: URLs containing the pattern 'nonexistent' were processed
+- Crawler behavior: URLs not matching the pattern were skipped but the crawler continued
 
-Note: URLs not matching the pattern 'nonexistent' were skipped but the crawler continued processing other URLs.
+## Successfully Crawled URLs
 
-## URLs Filtered by Pattern (showing up to 20)
+## URLs Skipped (Pattern Mismatch) (showing up to 20)
 - https://example.com

@@ -119,11 +119,11 @@ def write_summary(output_dir, stats, config):
         content = f"""# Crawl Summary
 
 ## Statistics
-- Total pages crawled: {stats['total']}
-- Successful crawls: {stats['success']}
+- Total URLs encountered: {stats['total']}
+- Successfully crawled and saved: {stats['success']}
 - Failed crawls: {stats['failed']}
-- Skipped (already crawled): {stats.get('skipped', 0)}
-- Skipped (pattern filtered): {stats.get('pattern_filtered', 0)}
+- Skipped (already in cache): {stats.get('skipped_cache', 0)}
+- Skipped (pattern mismatch): {stats.get('skipped_pattern', 0)}
 - Time taken: {stats['time_taken']:.2f} seconds
 
 ## Configuration
@@ -134,21 +134,41 @@ def write_summary(output_dir, stats, config):
 - Force recrawl: {config.get('force_recrawl', False)}
 - URL pattern: {config.get('url_pattern', 'None')}
 
-## Crawled URLs
+## Filtering Information
 """
+        # Add information about cache-based filtering
+        if not config.get('force_recrawl', False):
+            content += f"- Cache-based filtering: Enabled (skipping pages already crawled in previous runs)\n"
+        else:
+            content += f"- Cache-based filtering: Disabled (--force-recrawl flag was set)\n"
 
-        # Add a note about URL filtering if a pattern was provided
+        # Add information about pattern-based filtering
         if config.get('url_pattern'):
-            content += f"\nNote: URLs not matching the pattern '{config.get('url_pattern')}' were skipped but the crawler continued processing other URLs.\n"
+            content += f"- Pattern-based filtering: Enabled (only processing URLs containing '{config.get('url_pattern')}')\n"
+            content += f"- Pattern matching: URLs containing the pattern '{config.get('url_pattern')}' were processed\n"
+            content += f"- Crawler behavior: URLs not matching the pattern were skipped but the crawler continued\n"
+        else:
+            content += f"- Pattern-based filtering: Disabled (no pattern specified)\n"
 
-        # Add filtered URLs section if any URLs were filtered
-        if stats.get('pattern_filtered', 0) > 0 and stats.get('filtered_urls', []):
-            content += f"\n## URLs Filtered by Pattern (showing up to 20)\n"
+        content += f"\n## Successfully Crawled URLs\n"
+
+        # Add section for URLs skipped due to cache
+        if stats.get('skipped_cache', 0) > 0 and stats.get('cached_urls', []):
+            content += f"\n## URLs Skipped (Already in Cache) (showing up to 20)\n"
+            for url in stats.get('cached_urls', [])[:20]:  # Limit to 20 URLs to avoid huge files
+                content += f"- {url}\n"
+
+            if len(stats.get('cached_urls', [])) > 20:
+                content += f"\n... and {len(stats.get('cached_urls', [])) - 20} more URLs were skipped due to cache.\n"
+
+        # Add section for URLs skipped due to pattern mismatch
+        if stats.get('skipped_pattern', 0) > 0 and stats.get('filtered_urls', []):
+            content += f"\n## URLs Skipped (Pattern Mismatch) (showing up to 20)\n"
             for url in stats.get('filtered_urls', [])[:20]:  # Limit to 20 URLs to avoid huge files
                 content += f"- {url}\n"
 
             if len(stats.get('filtered_urls', [])) > 20:
-                content += f"\n... and {len(stats.get('filtered_urls', [])) - 20} more URLs were filtered.\n"
+                content += f"\n... and {len(stats.get('filtered_urls', [])) - 20} more URLs were skipped due to pattern mismatch.\n"
 
         for url in stats['urls']:
             content += f"- {url}\n"
@@ -252,13 +272,14 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
 
     # Statistics tracking
     stats = {
-        'total': 0,
-        'success': 0,
-        'failed': 0,
-        'skipped': 0,
-        'pattern_filtered': 0,  # URLs filtered by pattern
-        'urls': [],
-        'filtered_urls': [],    # URLs that didn't match the pattern
+        'total': 0,             # Total URLs encountered
+        'success': 0,           # Successfully crawled and saved
+        'failed': 0,            # Failed to crawl
+        'skipped_cache': 0,     # Skipped due to cache (already crawled)
+        'skipped_pattern': 0,   # Skipped due to pattern mismatch
+        'urls': [],             # Successfully crawled URLs
+        'cached_urls': [],      # URLs skipped due to cache
+        'filtered_urls': [],    # URLs skipped due to pattern mismatch
         'start_time': time.time()
     }
 
@@ -271,16 +292,17 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
 
                 # Skip URLs that have already been crawled unless force_recrawl is True
                 if not force_recrawl and result.url in cache:
-                    stats['skipped'] += 1
-                    print(f"[{stats['total']}] Skipped: {result.url} - Already crawled on {cache[result.url]}")
+                    stats['skipped_cache'] += 1
+                    stats['cached_urls'].append(result.url)
+                    print(f"[{stats['total']}] Skipped (cache): {result.url} - Already crawled on {cache[result.url]}")
                     continue
 
                 # Check if URL matches the pattern (if a pattern was provided)
                 if url_pattern and url_pattern_regex:
                     if not url_pattern_regex.match(result.url):
-                        stats['pattern_filtered'] += 1
+                        stats['skipped_pattern'] += 1
                         stats['filtered_urls'].append(result.url)
-                        print(f"[{stats['total']}] Pattern filtered: {result.url} - Does not match pattern '{url_pattern}'")
+                        print(f"[{stats['total']}] Skipped (pattern): {result.url} - Does not match pattern '{url_pattern}'")
                         continue
 
                 if result.success:
@@ -338,7 +360,7 @@ def main():
     parser.add_argument('--max-depth', type=int, default=2, help='Maximum depth to crawl (default: 2)')
     parser.add_argument('--force-recrawl', action='store_true', default=False, help='Force recrawling of already crawled pages')
     parser.add_argument('--concurrent-tasks', type=int, default=5, help='Maximum number of concurrent crawling tasks (default: 5)')
-    parser.add_argument('--url-pattern', default="https://developer.chrome.com/docs/extensions*", help='Pattern to filter URLs (only URLs containing this pattern will be processed)')
+    parser.add_argument('--url-pattern', help='Pattern to filter URLs (only URLs containing this pattern will be processed)')
 
     args = parser.parse_args()
 
@@ -373,14 +395,25 @@ def main():
 
         # Print final statistics
         print("\nCrawl completed!")
-        print(f"Total pages: {stats['total']}")
-        print(f"Successful: {stats['success']}")
-        print(f"Failed: {stats['failed']}")
-        print(f"Skipped (already crawled): {stats.get('skipped', 0)}")
-        print(f"Skipped (pattern filtered): {stats.get('pattern_filtered', 0)}")
+        print(f"Total URLs encountered: {stats['total']}")
+        print(f"Successfully crawled and saved: {stats['success']}")
+        print(f"Failed crawls: {stats['failed']}")
+        print(f"Skipped (already in cache): {stats.get('skipped_cache', 0)}")
+        print(f"Skipped (pattern mismatch): {stats.get('skipped_pattern', 0)}")
+
+        # Print filtering information
+        print("\nFiltering Information:")
+        if not args.force_recrawl:
+            print("- Cache-based filtering: Enabled (skipping pages already crawled in previous runs)")
+        else:
+            print("- Cache-based filtering: Disabled (--force-recrawl flag was set)")
+
         if args.url_pattern:
-            print(f"URL pattern: {args.url_pattern}")
-        print(f"Time taken: {stats['time_taken']:.2f} seconds")
+            print(f"- Pattern-based filtering: Enabled (only processing URLs containing '{args.url_pattern}')")
+        else:
+            print("- Pattern-based filtering: Disabled (no pattern specified)")
+
+        print(f"\nTime taken: {stats['time_taken']:.2f} seconds")
         print(f"Results saved to: {output_dir}")
 
         return 0
