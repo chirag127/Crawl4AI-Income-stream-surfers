@@ -123,6 +123,7 @@ def write_summary(output_dir, stats, config):
 - Successful crawls: {stats['success']}
 - Failed crawls: {stats['failed']}
 - Skipped (already crawled): {stats.get('skipped', 0)}
+- Skipped (pattern filtered): {stats.get('pattern_filtered', 0)}
 - Time taken: {stats['time_taken']:.2f} seconds
 
 ## Configuration
@@ -131,9 +132,23 @@ def write_summary(output_dir, stats, config):
 - Max depth: {config['max_depth']}
 - Include external: {config['include_external']}
 - Force recrawl: {config.get('force_recrawl', False)}
+- URL pattern: {config.get('url_pattern', 'None')}
 
 ## Crawled URLs
 """
+
+        # Add a note about URL filtering if a pattern was provided
+        if config.get('url_pattern'):
+            content += f"\nNote: URLs not matching the pattern '{config.get('url_pattern')}' were skipped but the crawler continued processing other URLs.\n"
+
+        # Add filtered URLs section if any URLs were filtered
+        if stats.get('pattern_filtered', 0) > 0 and stats.get('filtered_urls', []):
+            content += f"\n## URLs Filtered by Pattern (showing up to 20)\n"
+            for url in stats.get('filtered_urls', [])[:20]:  # Limit to 20 URLs to avoid huge files
+                content += f"- {url}\n"
+
+            if len(stats.get('filtered_urls', [])) > 20:
+                content += f"\n... and {len(stats.get('filtered_urls', [])) - 20} more URLs were filtered.\n"
 
         for url in stats['urls']:
             content += f"- {url}\n"
@@ -147,7 +162,7 @@ def write_summary(output_dir, stats, config):
         return None
 
 
-async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, include_external=False, force_recrawl=False):
+async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, include_external=False, force_recrawl=False, url_pattern=None):
     """
     Crawl a website and save the results as markdown files.
 
@@ -158,6 +173,7 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         max_depth: Maximum depth to crawl
         include_external: Whether to follow external links
         force_recrawl: Whether to recrawl pages that have already been crawled
+        url_pattern: Pattern to filter URLs (will be converted to wildcard pattern)
 
     Returns:
         Dictionary with statistics about the crawl
@@ -189,7 +205,21 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         verbose=False
     )
 
-    # Set up the deep crawl strategy
+    # Prepare URL pattern for application-level filtering
+    url_pattern_regex = None
+    if url_pattern:
+        try:
+            # Convert the pattern to a regex for application-level filtering
+            # For example: "example" becomes ".*example.*"
+            regex_pattern = f".*{url_pattern}.*"
+            url_pattern_regex = re.compile(regex_pattern, re.IGNORECASE)
+            print(f"Using URL pattern filter: {url_pattern} (regex: {regex_pattern})")
+        except Exception as e:
+            print(f"Warning: Invalid URL pattern '{url_pattern}': {str(e)}")
+            print("Continuing without URL pattern filtering...")
+
+    # Set up the deep crawl strategy without URL filtering
+    # This allows the crawler to discover all URLs, and we'll filter at the application level
     deep_crawl_strategy = BFSDeepCrawlStrategy(
         max_depth=max_depth,
         include_external=include_external,
@@ -226,7 +256,9 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         'success': 0,
         'failed': 0,
         'skipped': 0,
+        'pattern_filtered': 0,  # URLs filtered by pattern
         'urls': [],
+        'filtered_urls': [],    # URLs that didn't match the pattern
         'start_time': time.time()
     }
 
@@ -242,6 +274,14 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
                     stats['skipped'] += 1
                     print(f"[{stats['total']}] Skipped: {result.url} - Already crawled on {cache[result.url]}")
                     continue
+
+                # Check if URL matches the pattern (if a pattern was provided)
+                if url_pattern and url_pattern_regex:
+                    if not url_pattern_regex.match(result.url):
+                        stats['pattern_filtered'] += 1
+                        stats['filtered_urls'].append(result.url)
+                        print(f"[{stats['total']}] Pattern filtered: {result.url} - Does not match pattern '{url_pattern}'")
+                        continue
 
                 if result.success:
                     stats['success'] += 1
@@ -278,7 +318,8 @@ async def crawl_website(url, max_pages=300, output_dir=None, max_depth=3, includ
         'max_pages': max_pages,
         'max_depth': max_depth,
         'include_external': include_external,
-        'force_recrawl': force_recrawl
+        'force_recrawl': force_recrawl,
+        'url_pattern': url_pattern
     }
     summary_path = write_summary(output_dir, stats, config)
     if summary_path:
@@ -297,6 +338,7 @@ def main():
     parser.add_argument('--max-depth', type=int, default=2, help='Maximum depth to crawl (default: 2)')
     parser.add_argument('--force-recrawl', action='store_true', default=False, help='Force recrawling of already crawled pages')
     parser.add_argument('--concurrent-tasks', type=int, default=5, help='Maximum number of concurrent crawling tasks (default: 5)')
+    parser.add_argument('--url-pattern', default="https://developer.chrome.com/docs/extensions", help='Pattern to filter URLs (only URLs containing this pattern will be processed)')
 
     args = parser.parse_args()
 
@@ -325,7 +367,8 @@ def main():
             output_dir=output_dir,
             max_depth=args.max_depth,
             include_external=args.include_external,
-            force_recrawl=args.force_recrawl
+            force_recrawl=args.force_recrawl,
+            url_pattern=args.url_pattern
         ))
 
         # Print final statistics
@@ -334,6 +377,9 @@ def main():
         print(f"Successful: {stats['success']}")
         print(f"Failed: {stats['failed']}")
         print(f"Skipped (already crawled): {stats.get('skipped', 0)}")
+        print(f"Skipped (pattern filtered): {stats.get('pattern_filtered', 0)}")
+        if args.url_pattern:
+            print(f"URL pattern: {args.url_pattern}")
         print(f"Time taken: {stats['time_taken']:.2f} seconds")
         print(f"Results saved to: {output_dir}")
 
