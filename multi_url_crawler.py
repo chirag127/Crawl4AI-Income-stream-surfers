@@ -338,7 +338,7 @@ def main():
     parser.add_argument('--max-depth', type=int, default=2, help='Maximum depth to crawl (default: 2)')
     parser.add_argument('--force-recrawl', action='store_true', default=False, help='Force recrawling of already crawled pages')
     parser.add_argument('--concurrent-tasks', type=int, default=5, help='Maximum number of concurrent crawling tasks (default: 5)')
-    parser.add_argument('--url-pattern', default="https://developer.chrome.com/docs/extensions", help='Pattern to filter URLs (only URLs containing this pattern will be processed)')
+    parser.add_argument('--url-pattern', default="https://developer.chrome.com/docs/extensions*", help='Pattern to filter URLs (only URLs containing this pattern will be processed)')
 
     args = parser.parse_args()
 
